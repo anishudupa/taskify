@@ -4,12 +4,16 @@ import User from "../models/User";
 import { genereateToken } from "../utils/jwt.util";
 import { ObjectId } from "mongoose";
 
-export const registerUser = async (req: Request, res: Response) => {
+export const registerUser = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
 	const { name, email, password } = req.body;
 	try {
 		const user = await User.findOne({ email });
 		if (user) {
-			return res.status(400).json({ message: "user already exists" });
+			res.status(400).json({ message: "user already exists" });
+			return;
 		}
 
 		const hashedPassword = await bcrypt.hash(password, 13);
@@ -22,21 +26,25 @@ export const registerUser = async (req: Request, res: Response) => {
 	}
 };
 
-export const loginUser = async (req: Request, res: Response) => {
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
 	const { email, password } = req.body;
 
 	try {
 		const user = await User.findOne({ email });
 		if (!user) {
-			return res.status(400).json({ message: "Invalid credentials" });
+			res.status(400).json({ message: "Invalid credentials" });
+			return;
 		}
 
-		const isMatch = await bcrypt.compare(password, user.password);
+		const isMatch = await bcrypt.compare(password, user!.password);
 		if (!isMatch) {
-			return res.status(400).json({ message: "Invalid credentials" });
+			res.status(400).json({ message: "Invalid credentials" });
+			return;
 		}
 
-		const token = genereateToken((user._id as ObjectId).toString());
-		return res.json({ token, user });
-	} catch (error) {}
+		const token = genereateToken((user!._id as ObjectId).toString());
+		res.json({ token, user });
+	} catch (error) {
+		res.status(500).json({ error: "Server error" });
+	}
 };

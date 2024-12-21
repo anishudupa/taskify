@@ -28,7 +28,10 @@ export const getTasks = async (req: Request, res: Response) => {
 	}
 };
 
-export const updateTask = async (req: Request, res: Response) => {
+export const updateTask = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
 	try {
 		const { id } = req.params;
 		const updates = req.body;
@@ -38,7 +41,8 @@ export const updateTask = async (req: Request, res: Response) => {
 			{ new: true }
 		);
 		if (!task) {
-			return res.status(400).json({ message: "Task not found" });
+			res.status(400).json({ message: "Task not found" });
+			return;
 		}
 		res.json(task);
 	} catch (error) {
@@ -46,12 +50,16 @@ export const updateTask = async (req: Request, res: Response) => {
 	}
 };
 
-export const deleteTask = async (req: Request, res: Response) => {
+export const deleteTask = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
 	const { id } = req.params;
 	try {
 		const task = Task.findOneAndDelete({ _id: id, user: req.headers["user"] });
 		if (!task) {
-			return res.status(400).json({ error: "Task not found" });
+			res.status(400).json({ error: "Task not found" });
+			return;
 		}
 		res.json({ message: "Task deleted successfully" });
 	} catch (error) {
