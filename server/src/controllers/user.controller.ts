@@ -8,21 +8,21 @@ export const registerUser = async (
 	req: Request,
 	res: Response
 ): Promise<void> => {
-	const { name, email, password } = req.body;
+	const { username, email, password } = req.body;
 	try {
 		const user = await User.findOne({ email });
 		if (user) {
 			res.status(400).json({ message: "user already exists" });
 			return;
 		}
-
 		const hashedPassword = await bcrypt.hash(password, 13);
 
-		const newUser = new User({ name, email, password: hashedPassword });
+		const newUser = new User({ username, email, password: hashedPassword });
 		await newUser.save();
 		res.status(201).json({ message: "user created successfully" });
+		return;
 	} catch (error) {
-		res.status(500).json({ error: "Server error" });
+		res.status(500).json({ message: "Server error", error });
 	}
 };
 
@@ -43,8 +43,21 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 		}
 
 		const token = genereateToken((user!._id as ObjectId).toString());
-		res.json({ token, user });
+		res.json({ message: "logged in successfully", token });
 	} catch (error) {
-		res.status(500).json({ error: "Server error" });
+		res.status(500).json({ message: "Server error", error });
+	}
+};
+
+export const getUser = async (req: Request, res: Response): Promise<void> => {
+	try {
+		const user = await User.findById(req.headers["user"]).select("-password");
+		if (!user) {
+			res.status(400).json({ message: "cannot find user" });
+			return;
+		}
+		res.json({ user });
+	} catch (error) {
+		res.status(500).json({ message: "server error", error });
 	}
 };

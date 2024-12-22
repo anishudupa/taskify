@@ -56,7 +56,10 @@ export const deleteTask = async (
 ): Promise<void> => {
 	const { id } = req.params;
 	try {
-		const task = Task.findOneAndDelete({ _id: id, user: req.headers["user"] });
+		const task = await Task.findOneAndDelete({
+			_id: id,
+			user: req.headers["user"],
+		});
 		if (!task) {
 			res.status(400).json({ error: "Task not found" });
 			return;

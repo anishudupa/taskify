@@ -12,8 +12,8 @@ const taskSchema: Schema = new Schema<ITask>(
 	{
 		title: { type: String, required: true },
 		description: { type: String },
-		status: { type: String, default: "pending" },
-		priority: { type: String, default: "low" },
+		status: { type: String, default: "Pending" },
+		priority: { type: String, default: "Low" },
 		user: { type: mongoose.Types.ObjectId, ref: "User", required: true },
 	},
 	{ timestamps: true }
