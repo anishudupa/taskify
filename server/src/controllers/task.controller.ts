@@ -13,18 +13,18 @@ export const createTask = async (req: Request, res: Response) => {
 		});
 
 		await task.save();
-		res.status(201).json({ task });
+		res.status(201).json({ message: "success", task });
 	} catch (error) {
-		res.status(500).json({ error: "Server error" });
+		res.status(500).json({ message: "Server error" });
 	}
 };
 
 export const getTasks = async (req: Request, res: Response) => {
 	try {
 		const tasks = await Task.find({ user: req.headers["user"] });
-		res.json(tasks);
+		res.json({ message: "success", tasks });
 	} catch (error) {
-		res.status(500).json({ error: "Server error" });
+		res.status(500).json({ message: "Server error", error });
 	}
 };
 
@@ -46,7 +46,7 @@ export const updateTask = async (
 		}
 		res.json(task);
 	} catch (error) {
-		res.status(500).json({ error: "Server error" });
+		res.status(500).json({ message: "Server error", error });
 	}
 };
 
@@ -61,11 +61,11 @@ export const deleteTask = async (
 			user: req.headers["user"],
 		});
 		if (!task) {
-			res.status(400).json({ error: "Task not found" });
+			res.status(400).json({ message: "Task not found" });
 			return;
 		}
 		res.json({ message: "Task deleted successfully" });
 	} catch (error) {
-		res.status(500).json({ error: "Server error" });
+		res.status(500).json({ message: "Server error" });
 	}
 };

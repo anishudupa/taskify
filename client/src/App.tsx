@@ -4,9 +4,14 @@ import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import AddTask from "./pages/AddTask";
 import UpdateTask from "./pages/UpdateTask";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
-// TODO: Add logic to each page, add Routes and add Protected route.
+const Protect = ({ children }: { children: React.ReactNode }) => {
+	const token = localStorage.getItem("token");
+	if (!token) {
+		return <Navigate to={"/signup"} replace />;
+	} else return <>{children}</>;
+};
 export default function App() {
 	return (
 		<BrowserRouter>
@@ -14,20 +19,35 @@ export default function App() {
 				<header>
 					<Header />
 				</header>
-				<main className="bg-[#1b1b1c] min-h-screen h-auto overflow-auto">
-					{/* <Signup /> */}
-					{/* <Login /> */}
-					{/* <TaskListPage /> */}
-					<AddTask />
-					{/* <UpdateTask
-						task={{
-							title: "lol",
-							id: "12",
-							description: "some description",
-							priority: "Low",
-							status: "Completed",
-						}}
-					/> */}
+				<main className="bg-[#1b1b1c] pt-20 min-h-screen h-auto overflow-auto">
+					<Routes>
+						<Route
+							path="/"
+							element={
+								<Protect>
+									<Home />
+								</Protect>
+							}
+						/>
+						<Route path="/signup" element={<Signup />} />
+						<Route path="/login" element={<Login />} />
+						<Route
+							path="/add-task"
+							element={
+								<Protect>
+									<AddTask />
+								</Protect>
+							}
+						/>
+						<Route
+							path="/update-task"
+							element={
+								<Protect>
+									<UpdateTask />
+								</Protect>
+							}
+						/>
+					</Routes>
 				</main>
 			</div>
 		</BrowserRouter>

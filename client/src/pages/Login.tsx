@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z, ZodSchema } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 
 const Login = () => {
 	const [showPassword, setShowPassword] = useState(false);
-	const URL = import.meta.env.VITE_API_URL;
 
 	const signUpSchema: ZodSchema = z.object({
 		email: z.string().email("Invalid email"),
@@ -17,6 +16,7 @@ const Login = () => {
 
 	type TSignUpSchema = z.infer<typeof signUpSchema>;
 
+	const navigate = useNavigate();
 	const {
 		handleSubmit,
 		register,
@@ -28,10 +28,11 @@ const Login = () => {
 
 	const onSubmit = async (data: any) => {
 		try {
-			const res = await API.post(`${URL}/users/login`, data);
+			const res = await API.post(`/users/login`, data);
 			const { message, token } = res.data;
 			localStorage.setItem("token", token);
 			toast.success(message);
+			navigate("/");
 		} catch (error: any) {
 			toast.error(error.response.data.message);
 		}

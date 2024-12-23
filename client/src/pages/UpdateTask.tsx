@@ -4,12 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ReactNode } from "react";
 import API from "../api/axios";
 import { toast } from "react-toastify";
-
-// TODO:
-/*
- 1. Add handleSubmit logic
- 2. ROUTE TO HOME PAGE AFTER A TASK IS UPDATED
-*/
+import { useNavigate, useLocation } from "react-router-dom";
 const taskSchema = z.object({
 	id: z.string().optional(),
 	title: z.string().min(1, "Title is required"),
@@ -20,8 +15,10 @@ const taskSchema = z.object({
 
 type TTaskSchema = z.infer<typeof taskSchema>;
 
-const UpdateTask = ({ task }: { task: TTaskSchema }) => {
-	const URL = import.meta.env.VITE_API_URL;
+const UpdateTask = () => {
+	const navigate = useNavigate();
+	const location = useLocation();
+	const task = location.state;
 	const {
 		handleSubmit,
 		register,
@@ -33,9 +30,8 @@ const UpdateTask = ({ task }: { task: TTaskSchema }) => {
 
 	const onSubmit = async (data: any) => {
 		try {
-			console.log(data);
-			const res = await API.post(`${URL}/tasks/${task}`, data);
-			console.log(res.data);
+			await API.put(`/tasks/${task?._id}`, data);
+			navigate("/");
 		} catch (error: any) {
 			toast.error(error.response.data.message);
 		}
@@ -47,7 +43,6 @@ const UpdateTask = ({ task }: { task: TTaskSchema }) => {
 				<h2 className="text-3xl font-bold text-white text-center mb-6">
 					Update Task
 				</h2>
-
 				<form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
 					<div>
 						<label htmlFor="title" className="text-white text-sm font-medium">
@@ -58,7 +53,7 @@ const UpdateTask = ({ task }: { task: TTaskSchema }) => {
 							name="title"
 							className="w-full p-3 mt-2 bg-[#3a3a3a] text-white rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
 							placeholder="Enter task title"
-							value={task.title}
+							defaultValue={task?.title}
 						/>
 						{errors.title && (
 							<span className="text-red-600 font-semibold">
@@ -79,7 +74,7 @@ const UpdateTask = ({ task }: { task: TTaskSchema }) => {
 							className="w-full p-3 mt-2 bg-[#3a3a3a] text-white rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
 							placeholder="Enter task description"
 							rows={4}
-							value={task.description}
+							defaultValue={task?.description}
 						/>
 						{errors.description && (
 							<span className="text-red-600 font-semibold">
@@ -99,7 +94,7 @@ const UpdateTask = ({ task }: { task: TTaskSchema }) => {
 								{...register("status")}
 								name="status"
 								className="w-full p-3 mt-2 bg-[#3a3a3a] text-white rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-								value={task.status}>
+								defaultValue={task?.status}>
 								<option value="Pending">Pending</option>
 								<option value="In Progress">In Progress</option>
 								<option value="Completed">Completed</option>
@@ -116,7 +111,7 @@ const UpdateTask = ({ task }: { task: TTaskSchema }) => {
 								{...register("priority")}
 								name="priority"
 								className="w-full p-3 mt-2 bg-[#3a3a3a] text-white rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-								value={task.priority}>
+								defaultValue={task?.priority}>
 								<option value="High">High</option>
 								<option value="Medium">Medium</option>
 								<option value="Low">Low</option>

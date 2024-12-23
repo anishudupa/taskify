@@ -4,11 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ReactNode } from "react";
 import API from "../api/axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
-// TODO:
-/*
- 1. ROUTE TO HOME PAGE AFTER A TASK IS ADDED
-*/
 const AddTask = () => {
 	const taskSchema: ZodSchema = z.object({
 		id: z.string().optional(),
@@ -20,7 +17,7 @@ const AddTask = () => {
 
 	type TTaskSchema = z.infer<typeof taskSchema>;
 
-	const URL = import.meta.env.VITE_API_URL;
+	const navigate = useNavigate();
 	const {
 		handleSubmit,
 		register,
@@ -32,9 +29,8 @@ const AddTask = () => {
 
 	const onSubmit = async (data: any) => {
 		try {
-			console.log(data);
-			const res = await API.post(`${URL}/tasks`, data);
-			console.log(res.data);
+			await API.post(`/tasks`, data);
+			navigate("/");
 		} catch (error: any) {
 			toast.error(error.response.data.message);
 		}

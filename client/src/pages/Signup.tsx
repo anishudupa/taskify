@@ -2,14 +2,13 @@ import { useState } from "react";
 import { z, ZodSchema } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import API from "../api/axios";
 import { toast } from "react-toastify";
 
-// TODO: NAVIGATE TO LOGIN ONCE SIGNED UP
 const Signup = () => {
 	const [showPassword, setShowPassword] = useState(false);
-	const URL = import.meta.env.VITE_API_URL;
+	const navigate = useNavigate();
 
 	const signUpSchema: ZodSchema = z.object({
 		username: z.string().min(3, "Username must contain atleast 3 letters"),
@@ -30,8 +29,10 @@ const Signup = () => {
 
 	const onSubmit = async (data: any) => {
 		try {
-			const res = await API.post(`${URL}/users/register`, data);
+			localStorage.setItem("username", data.username);
+			const res = await API.post(`/users/register`, data);
 			if (res.data) toast.success(res.data.message);
+			navigate("/login");
 		} catch (error: any) {
 			toast.error(error.response.data.message);
 		}
@@ -46,7 +47,6 @@ const Signup = () => {
 				</h2>
 
 				<form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-					{/* Username */}
 					<div>
 						<label
 							htmlFor="username"
@@ -67,7 +67,6 @@ const Signup = () => {
 						)}
 					</div>
 
-					{/* Email */}
 					<div>
 						<label htmlFor="email" className="text-white text-sm font-medium">
 							Email Address
@@ -86,7 +85,6 @@ const Signup = () => {
 						)}
 					</div>
 
-					{/* Password */}
 					<div className="relative">
 						<label
 							htmlFor="password"
@@ -106,7 +104,7 @@ const Signup = () => {
 								{errors.password.message as React.ReactNode}
 							</span>
 						)}
-						{/* Eye Icon to toggle password visibility */}
+
 						{showPassword ? (
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -149,7 +147,6 @@ const Signup = () => {
 						)}
 					</div>
 
-					{/* Submit Button */}
 					<button
 						type="submit"
 						className="w-full py-3 mt-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -158,7 +155,6 @@ const Signup = () => {
 					</button>
 				</form>
 
-				{/* Login Link */}
 				<div className="mt-4 text-center">
 					<p className="text-sm text-gray-400">
 						Already have an account?{" "}
