@@ -29,7 +29,6 @@ const Signup = () => {
 
 	const onSubmit = async (data: any) => {
 		try {
-			localStorage.setItem("username", data.username);
 			const res = await API.post(`/users/register`, data);
 			if (res.data) toast.success(res.data.message);
 			navigate("/login");
